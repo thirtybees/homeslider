@@ -28,7 +28,7 @@
  * @since   1.5.0
  */
 
-if (!defined('_PS_VERSION_'))
+if (!defined('_TB_VERSION_'))
 	exit;
 
 include_once(_PS_MODULE_DIR_.'homeslider/HomeSlide.php');
@@ -45,8 +45,8 @@ class HomeSlider extends Module
 	{
 		$this->name = 'homeslider';
 		$this->tab = 'front_office_features';
-		$this->version = '1.6.1';
-		$this->author = 'PrestaShop';
+		$this->version = '2.0.0';
+		$this->author = 'thirty bees';
 		$this->need_instance = 0;
 		$this->secure_key = Tools::encrypt($this->name);
 		$this->bootstrap = true;
