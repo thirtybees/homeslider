@@ -53,7 +53,7 @@ class HomeSlider extends Module
 
 		parent::__construct();
 
-		$this->displayName = $this->l('Image slider for your homepage');
+		$this->displayName = $this->l('Block Image Slider');
 		$this->description = $this->l('Adds an image slider to your homepage.');
 		$this->ps_versions_compliancy = array('min' => '1.6.0.4', 'max' => '1.6.99.99');
 	}
