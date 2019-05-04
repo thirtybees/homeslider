@@ -55,6 +55,7 @@ class HomeSlider extends Module
 		$this->displayName = $this->l('Block Image Slider');
 		$this->description = $this->l('Adds an image slider to your homepage.');
 		$this->tb_versions_compliancy = '> 1.0.0';
+		$this->tb_min_version = '1.0.0';
 		$this->ps_versions_compliancy = array('min' => '1.6.0.4', 'max' => '1.6.99.99');
 	}
 
