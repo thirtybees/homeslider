@@ -114,9 +114,6 @@ class HomeSlider extends Module
 			if ($res)
 				$this->installSamples();
 
-			// Disable on mobiles and tablets
-			$this->disableDevice(Context::DEVICE_MOBILE);
-
 			return (bool)$res;
 		}
 
