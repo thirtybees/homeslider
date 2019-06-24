@@ -134,12 +134,30 @@ class HomeSlider extends Module
 			foreach ($languages as $language)
 			{
 				$slide->title[$language['id_lang']] = 'Sample '.$i;
-				$slide->description[$language['id_lang']] = '<h2>EXCEPTEUR<br />OCCAECAT</h2>
-				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tristique in tortor et dignissim. Quisque non tempor leo. Maecenas egestas sem elit</p>
-				<p><button class="btn btn-default" type="button">Shop now !</button></p>';
 				$slide->legend[$language['id_lang']] = 'sample-'.$i;
 				$slide->url[$language['id_lang']] = 'https://thirtybees.com';
 				$slide->image[$language['id_lang']] = 'sample-'.$i.'.jpg';
+
+				// Provide sample texts not colliding with the sample image behind them.
+				if ($i === 1) {
+					$slide->description[$language['id_lang']] = '
+						<h2>EXCEPTEUR<br>OCCAECAT</h2>
+
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tristique in tortor et dignissim. Quisque non tempor leo. Maecenas egestas sem elit</p>
+
+						<p><button class="btn btn-default" type="button">Shop now !</button></p>
+					';
+				} elseif ($i === 2) {
+					$slide->description[$language['id_lang']] = '
+						<h2>EXCEPTEUR</h2>
+					';
+				} elseif ($i === 3) {
+					$slide->description[$language['id_lang']] = '
+						<h2>EXCEPTEUR</h2>
+
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tristique in tortor et dignissim. Quisque non tempor leo. Maecenas egestas sem elit</p>
+					';
+				}
 			}
 			$slide->add();
 		}
