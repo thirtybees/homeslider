@@ -919,7 +919,8 @@ class HomeSlider extends Module
 						'type' => 'text',
 						'label' => $this->l('Maximum image width'),
 						'name' => 'HOMESLIDER_WIDTH',
-						'suffix' => 'pixels'
+						'suffix' => 'pixels',
+						'desc' => $this->l('This is the width of the slider. Images get scaled to fit. Height of the container adjusts automatically to fit the highest enabled image.'),
 					),
 					array(
 						'type' => 'text',
