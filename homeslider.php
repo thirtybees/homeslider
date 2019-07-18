@@ -44,7 +44,7 @@ class HomeSlider extends Module
 	{
 		$this->name = 'homeslider';
 		$this->tab = 'front_office_features';
-		$this->version = '2.0.4';
+		$this->version = '2.0.5';
 		$this->author = 'thirty bees';
 		$this->need_instance = 0;
 		$this->secure_key = Tools::encrypt($this->name);
