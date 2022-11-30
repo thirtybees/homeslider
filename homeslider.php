@@ -47,7 +47,6 @@ class HomeSlider extends Module
 		$this->version = '2.0.5';
 		$this->author = 'thirty bees';
 		$this->need_instance = 0;
-		$this->secure_key = Tools::encrypt($this->name);
 		$this->bootstrap = true;
 
 		parent::__construct();
@@ -670,7 +669,7 @@ class HomeSlider extends Module
 					cursor: "move",
 					update: function() {
 						var order = $(this).sortable("serialize") + "&action=updateSlidesPosition";
-						$.post("'.$this->context->shop->physical_uri.$this->context->shop->virtual_uri.'modules/'.$this->name.'/ajax_'.$this->name.'.php?secure_key='.$this->secure_key.'", order);
+						$.post("'.$this->context->shop->physical_uri.$this->context->shop->virtual_uri.'modules/'.$this->name.'/ajax_'.$this->name.'.php?secure_key='.$this->getSecureKey().'", order);
 						}
 					});
 				$mySlides.hover(function() {
@@ -1090,4 +1089,12 @@ class HomeSlider extends Module
 					$this->l('This slide is shared with other shops! All shops associated to this slide will apply modifications made here').
 				'</p>';
 	}
+
+    /**
+     * @return string
+     */
+    public function getSecureKey()
+    {
+        return Tools::encrypt($this->name);
+    }
 }

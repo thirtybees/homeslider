@@ -27,10 +27,10 @@ include_once('../../config/config.inc.php');
 include_once('../../init.php');
 include_once('homeslider.php');
 
-$home_slider = new HomeSlider();
+$homeSlider = new HomeSlider();
 $slides = array();
 
-if (!Tools::isSubmit('secure_key') || Tools::getValue('secure_key') != $home_slider->secure_key || !Tools::getValue('action'))
+if (!Tools::isSubmit('secure_key') || Tools::getValue('secure_key') != $homeSlider->getSecureKey() || !Tools::getValue('action'))
 	die(1);
 
 if (Tools::getValue('action') == 'updateSlidesPosition' && Tools::getValue('slides'))
@@ -43,5 +43,5 @@ if (Tools::getValue('action') == 'updateSlidesPosition' && Tools::getValue('slid
 			WHERE `id_homeslider_slides` = '.(int)$id_slide
 		);
 
-	$home_slider->clearCache();
+	$homeSlider->clearCache();
 }
