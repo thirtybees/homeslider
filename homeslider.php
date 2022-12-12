@@ -1019,6 +1019,8 @@ class HomeSlider extends Module
             }
         }
 
+        /** @var AdminModulesController $controller */
+        $controller = $this->context->controller;
         $helper = new HelperForm();
         $helper->show_toolbar = false;
         $helper->table = $this->table;
@@ -1038,7 +1040,7 @@ class HomeSlider extends Module
                 'iso_code' => $language->iso_code
             ),
             'fields_value' => $this->getAddFieldsValues(),
-            'languages' => $this->context->controller->getLanguages(),
+            'languages' => $controller->getLanguages(),
             'id_language' => $this->context->language->id,
             'image_baseurl' => $this->_path . 'images/'
         );
@@ -1114,6 +1116,8 @@ class HomeSlider extends Module
             ),
         );
 
+        /** @var AdminModulesController $controller */
+        $controller = $this->context->controller;
         $helper = new HelperForm();
         $helper->show_toolbar = false;
         $helper->table = $this->table;
@@ -1127,7 +1131,7 @@ class HomeSlider extends Module
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->tpl_vars = array(
             'fields_value' => $this->getConfigFieldsValues(),
-            'languages' => $this->context->controller->getLanguages(),
+            'languages' => $controller->getLanguages(),
             'id_language' => $this->context->language->id
         );
 
@@ -1173,14 +1177,26 @@ class HomeSlider extends Module
         $languages = Language::getLanguages(false);
 
         foreach ($languages as $lang) {
-            $fields['image'][$lang['id_lang']] = Tools::getValue('image_' . (int)$lang['id_lang']);
-            $fields['title'][$lang['id_lang']] = Tools::getValue('title_' . (int)$lang['id_lang'], $slide->title[$lang['id_lang']]);
-            $fields['url'][$lang['id_lang']] = Tools::getValue('url_' . (int)$lang['id_lang'], $slide->url[$lang['id_lang']]);
-            $fields['legend'][$lang['id_lang']] = Tools::getValue('legend_' . (int)$lang['id_lang'], $slide->legend[$lang['id_lang']]);
-            $fields['description'][$lang['id_lang']] = Tools::getValue('description_' . (int)$lang['id_lang'], $slide->description[$lang['id_lang']]);
+            $langId = (int)$lang['id_lang'];
+            $fields['image'][$langId] = Tools::getValue('image_' . $langId);
+            $fields['title'][$langId] = Tools::getValue('title_' . $langId, static::getLangValue($slide->title, $langId));
+            $fields['url'][$langId] = Tools::getValue('url_' . $langId, static::getLangValue($slide->url, $langId));
+            $fields['legend'][$langId] = Tools::getValue('legend_' . $langId, static::getLangValue($slide->legend, $langId));
+            $fields['description'][$langId] = Tools::getValue('description_' . $langId, static::getLangValue($slide->description, $langId));
         }
 
         return $fields;
+    }
+
+    /**
+     * @param array|null $array
+     * @param int $langId
+     *
+     * @return string
+     */
+    protected static function getLangValue($array, $langId)
+    {
+        return isset($array[$langId]) ? (string)$array[$langId] : '';
     }
 
     /**
