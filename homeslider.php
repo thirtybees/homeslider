@@ -214,7 +214,7 @@ class HomeSlider extends Module
     /**
      * Creates tables
      *
-     * @return int
+     * @return bool
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
@@ -573,9 +573,7 @@ class HomeSlider extends Module
                     } elseif (!ImageManager::resize($temp_name, dirname(__FILE__) . '/images/' . $salt . '_' . $_FILES['image_' . $language['id_lang']]['name'], null, null, $type)) {
                         $errors[] = $this->displayError($this->l('An error occurred during the image upload process.'));
                     }
-                    if (isset($temp_name)) {
-                        @unlink($temp_name);
-                    }
+                    @unlink($temp_name);
                     $slide->image[$language['id_lang']] = $salt . '_' . $_FILES['image_' . $language['id_lang']]['name'];
                 } elseif (Tools::getValue('image_old_' . $language['id_lang']) != '') {
                     $slide->image[$language['id_lang']] = Tools::getValue('image_old_' . $language['id_lang']);
@@ -1229,7 +1227,7 @@ class HomeSlider extends Module
                 '</p>';
         } else {
             return '<p class="alert alert-danger">' .
-                sprintf($this->l('You cannot add slides from a "All Shops" or a "Group Shop" context')) .
+                $this->l('You cannot add slides from a "All Shops" or a "Group Shop" context') .
                 '</p>';
         }
     }
@@ -1254,8 +1252,6 @@ class HomeSlider extends Module
      */
     protected function getCurrentShopInfoMsg()
     {
-        $shop_info = null;
-
         if (Shop::isFeatureActive()) {
             if (Shop::getContext() == Shop::CONTEXT_SHOP) {
                 $shop_info = sprintf($this->l('The modifications will be applied to shop: %s'), $this->context->shop->name);
