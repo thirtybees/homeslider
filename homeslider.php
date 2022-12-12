@@ -31,7 +31,7 @@ if (!defined('_TB_VERSION_')) {
     exit;
 }
 
-include_once(_PS_MODULE_DIR_ . 'homeslider/HomeSlide.php');
+include_once(__DIR__ . '/HomeSlide.php');
 
 class HomeSlider extends Module
 {
