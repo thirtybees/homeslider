@@ -32,17 +32,19 @@ include_once('homeslider.php');
 $homeSlider = new HomeSlider();
 $slides = array();
 
-if (!Tools::isSubmit('secure_key') || Tools::getValue('secure_key') != $homeSlider->getSecureKey() || !Tools::getValue('action'))
+if (!Tools::isSubmit('secure_key') || Tools::getValue('secure_key') != $homeSlider->getSecureKey() || !Tools::getValue('action')) {
     die(1);
+}
 
 if (Tools::getValue('action') == 'updateSlidesPosition' && Tools::getValue('slides')) {
     $slides = Tools::getValue('slides');
 
-    foreach ($slides as $position => $id_slide)
+    foreach ($slides as $position => $id_slide) {
         $res = Db::getInstance()->execute('
 			UPDATE `' . _DB_PREFIX_ . 'homeslider_slides` SET `position` = ' . (int)$position . '
 			WHERE `id_homeslider_slides` = ' . (int)$id_slide
         );
+    }
 
     $homeSlider->clearCache();
 }
