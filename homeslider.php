@@ -55,7 +55,7 @@ class HomeSlider extends Module
     {
         $this->name = 'homeslider';
         $this->tab = 'front_office_features';
-        $this->version = '2.0.5';
+        $this->version = '2.1.0';
         $this->author = 'thirty bees';
         $this->need_instance = 0;
         $this->bootstrap = true;
