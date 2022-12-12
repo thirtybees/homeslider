@@ -121,7 +121,7 @@ class HomeSlide extends ObjectModel
     }
 
     /**
-     * @return int
+     * @return bool
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
@@ -129,24 +129,25 @@ class HomeSlide extends ObjectModel
     {
         $res = true;
 
-        $images = $this->image;
-        foreach ($images as $image) {
-            if (preg_match('/sample/', $image) === 0) {
-                if ($image && file_exists(dirname(__FILE__) . '/images/' . $image)) {
-                    $res &= @unlink(dirname(__FILE__) . '/images/' . $image);
-                }
+        // delete image files
+        foreach ($this->image as $image) {
+            $filepath = HomeSlider::getImageDir() . $image;
+            if ($image && file_exists($filepath)) {
+                $res = unlink($filepath) && $res;
             }
         }
 
-        $res &= $this->reOrderPositions();
+        // reorder positions
+        $res = $this->reOrderPositions() && $res;
 
-        $res &= Db::getInstance()->execute('
+        // delete slides
+        $res = Db::getInstance()->execute('
 			DELETE FROM `' . _DB_PREFIX_ . 'homeslider`
 			WHERE `id_homeslider_slides` = ' . (int)$this->id
-        );
+        ) && $res;
 
-        $res &= parent::delete();
-        return $res;
+        // delete record
+        return parent::delete() && $res;
     }
 
     /**

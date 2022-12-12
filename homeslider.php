@@ -35,26 +35,17 @@ include_once(__DIR__ . '/HomeSlide.php');
 
 class HomeSlider extends Module
 {
+    const ALLOWED_EXTENSIONS = [ 'jpg', 'jpeg', 'gif', 'png' ];
+    const DEFAULT_WIDTH =  1140;
+    const DEFAULT_SPEED = 500;
+    const DEFAULT_PAUSE = 3000;
+    const DEFAULT_LOOP = 1;
+
     /**
      * @var string
      */
     protected $_html = '';
-    /**
-     * @var int
-     */
-    protected $default_width = 779;
-    /**
-     * @var int
-     */
-    protected $default_speed = 500;
-    /**
-     * @var int
-     */
-    protected $default_pause = 3000;
-    /**
-     * @var int
-     */
-    protected $default_loop = 1;
+
 
     /**
      * @throws PrestaShopDatabaseException
@@ -106,27 +97,27 @@ class HomeSlider extends Module
                 }
 
                 /* Sets up configuration */
-                $res = Configuration::updateValue('HOMESLIDER_WIDTH', $this->default_width, false, $shop_group_id, $shop_id) && $res;
-                $res = Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed, false, $shop_group_id, $shop_id) && $res;
-                $res = Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause, false, $shop_group_id, $shop_id) && $res;
-                $res = Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop, false, $shop_group_id, $shop_id) && $res;
+                $res = Configuration::updateValue('HOMESLIDER_WIDTH', static::DEFAULT_WIDTH, false, $shop_group_id, $shop_id) && $res;
+                $res = Configuration::updateValue('HOMESLIDER_SPEED', static::DEFAULT_SPEED, false, $shop_group_id, $shop_id) && $res;
+                $res = Configuration::updateValue('HOMESLIDER_PAUSE', static::DEFAULT_PAUSE, false, $shop_group_id, $shop_id) && $res;
+                $res = Configuration::updateValue('HOMESLIDER_LOOP', static::DEFAULT_LOOP, false, $shop_group_id, $shop_id) && $res;
             }
 
             /* Sets up Shop Group configuration */
             if ($shop_groups_list) {
                 foreach ($shop_groups_list as $shop_group_id) {
-                    $res = Configuration::updateValue('HOMESLIDER_WIDTH', $this->default_width, false, $shop_group_id) && $res;
-                    $res = Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed, false, $shop_group_id) && $res;
-                    $res = Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause, false, $shop_group_id) && $res;
-                    $res = Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop, false, $shop_group_id) && $res;
+                    $res = Configuration::updateValue('HOMESLIDER_WIDTH', static::DEFAULT_WIDTH, false, $shop_group_id) && $res;
+                    $res = Configuration::updateValue('HOMESLIDER_SPEED', static::DEFAULT_SPEED, false, $shop_group_id) && $res;
+                    $res = Configuration::updateValue('HOMESLIDER_PAUSE', static::DEFAULT_PAUSE, false, $shop_group_id) && $res;
+                    $res = Configuration::updateValue('HOMESLIDER_LOOP', static::DEFAULT_LOOP, false, $shop_group_id) && $res;
                 }
             }
 
             /* Sets up Global configuration */
-            $res = Configuration::updateValue('HOMESLIDER_WIDTH', $this->default_width) && $res;
-            $res = Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed) && $res;
-            $res = Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause) && $res;
-            $res = Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop) && $res;
+            $res = Configuration::updateValue('HOMESLIDER_WIDTH', static::DEFAULT_WIDTH) && $res;
+            $res = Configuration::updateValue('HOMESLIDER_SPEED', static::DEFAULT_SPEED) && $res;
+            $res = Configuration::updateValue('HOMESLIDER_PAUSE', static::DEFAULT_PAUSE) && $res;
+            $res = Configuration::updateValue('HOMESLIDER_LOOP', static::DEFAULT_LOOP) && $res;
 
             /* Creates tables */
             $res = $this->createTables() && $res;
@@ -150,37 +141,23 @@ class HomeSlider extends Module
      */
     protected function installSamples()
     {
-        $languages = Language::getLanguages(false);
-        for ($i = 1; $i <= 3; ++$i) {
+        $dir = __DIR__ . '/fixtures/';
+        $languages = Language::getLanguages(false, false, true);
+        $fixtures = json_decode(file_get_contents($dir . 'fixtures.json'), true);
+
+        $position = 0;
+        foreach ($fixtures as $entry) {
+            $position++;
             $slide = new HomeSlide();
-            $slide->position = $i;
+            $slide->position = $position;
             $slide->active = 1;
-            foreach ($languages as $language) {
-                $slide->title[$language['id_lang']] = 'Sample ' . $i;
-                $slide->legend[$language['id_lang']] = 'sample-' . $i;
-                $slide->url[$language['id_lang']] = 'https://thirtybees.com';
-                $slide->image[$language['id_lang']] = 'sample-' . $i . '.jpg';
-
-                // Provide sample texts not colliding with the sample image behind them.
-                if ($i === 1) {
-                    $slide->description[$language['id_lang']] = '
-						<h2>EXCEPTEUR<br>OCCAECAT</h2>
-
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tristique in tortor et dignissim. Quisque non tempor leo. Maecenas egestas sem elit</p>
-
-						<p><button class="btn btn-default" type="button">Shop now !</button></p>
-					';
-                } elseif ($i === 2) {
-                    $slide->description[$language['id_lang']] = '
-						<h2>EXCEPTEUR</h2>
-					';
-                } elseif ($i === 3) {
-                    $slide->description[$language['id_lang']] = '
-						<h2>EXCEPTEUR</h2>
-
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tristique in tortor et dignissim. Quisque non tempor leo. Maecenas egestas sem elit</p>
-					';
-                }
+            $imageUrl = $this->processImage($dir . $entry['image'], $entry['image']);
+            foreach ($languages as $langId) {
+                $slide->title[$langId] = $entry['title'];
+                $slide->legend[$langId] = $entry['legend'];
+                $slide->url[$langId] = 'https://thirtybees.com';
+                $slide->image[$langId] = $imageUrl;
+                $slide->description[$langId] = $entry['description'];
             }
             $slide->add();
         }
@@ -204,6 +181,9 @@ class HomeSlider extends Module
             $res = Configuration::deleteByName('HOMESLIDER_SPEED') && $res;
             $res = Configuration::deleteByName('HOMESLIDER_PAUSE') && $res;
             $res = Configuration::deleteByName('HOMESLIDER_LOOP') && $res;
+
+            // delete all images
+            static::cleanImages([]);
 
             return $res;
         }
@@ -406,9 +386,6 @@ class HomeSlider extends Module
                 if (Tools::getValue('image_' . $language['id_lang']) != null && !Validate::isFileName(Tools::getValue('image_' . $language['id_lang']))) {
                     $errors[] = $this->l('Invalid filename.');
                 }
-                if (Tools::getValue('image_old_' . $language['id_lang']) != null && !Validate::isFileName(Tools::getValue('image_old_' . $language['id_lang']))) {
-                    $errors[] = $this->l('Invalid filename.');
-                }
             }
 
             /* Checks title/url/legend/description for default lang */
@@ -423,9 +400,6 @@ class HomeSlider extends Module
                 $errors[] = $this->l('The URL is not set.');
             }
             if (!Tools::isSubmit('has_picture') && (!isset($_FILES['image_' . $id_lang_default]) || empty($_FILES['image_' . $id_lang_default]['tmp_name']))) {
-                $errors[] = $this->l('The image is not set.');
-            }
-            if (Tools::getValue('image_old_' . $id_lang_default) && !Validate::isFileName(Tools::getValue('image_old_' . $id_lang_default))) {
                 $errors[] = $this->l('The image is not set.');
             }
         } elseif (Tools::isSubmit('delete_id_slide') && (!Validate::isInt(Tools::getValue('delete_id_slide')) || !$this->slideExists((int)Tools::getValue('delete_id_slide')))) {
@@ -452,7 +426,7 @@ class HomeSlider extends Module
      */
     protected function _postProcess()
     {
-        $errors = array();
+        $errors = [];
         $shop_context = Shop::getContext();
 
         /* Processes Slider */
@@ -505,7 +479,7 @@ class HomeSlider extends Module
             $this->clearCache();
 
             if (!$res) {
-                $errors[] = $this->displayError($this->l('The configuration could not be updated.'));
+                $errors[] = $this->l('The configuration could not be updated.');
             } else {
                 Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true) . '&conf=6&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name);
             }
@@ -538,45 +512,31 @@ class HomeSlider extends Module
             /* Sets active */
             $slide->active = (int)Tools::getValue('active_slide');
 
-            /* Sets each langue fields */
+            /* Sets each language fields */
             $languages = Language::getLanguages(false);
-
             foreach ($languages as $language) {
-                $slide->title[$language['id_lang']] = Tools::getValue('title_' . $language['id_lang']);
-                $slide->url[$language['id_lang']] = Tools::getValue('url_' . $language['id_lang']);
-                $slide->legend[$language['id_lang']] = Tools::getValue('legend_' . $language['id_lang']);
-                $slide->description[$language['id_lang']] = Tools::getValue('description_' . $language['id_lang']);
+                $langId = (int)$language['id_lang'];
+                $slide->title[$langId] = Tools::getValue('title_' . $langId);
+                $slide->url[$langId] = Tools::getValue('url_' . $langId);
+                $slide->legend[$langId] = Tools::getValue('legend_' . $langId);
+                $slide->description[$langId] = Tools::getValue('description_' . $langId);
 
                 /* Uploads image and sets slide */
-                $type = strtolower(substr(strrchr($_FILES['image_' . $language['id_lang']]['name'], '.'), 1));
-                $imagesize = @getimagesize($_FILES['image_' . $language['id_lang']]['tmp_name']);
-                if (isset($_FILES['image_' . $language['id_lang']]) &&
-                    isset($_FILES['image_' . $language['id_lang']]['tmp_name']) &&
-                    !empty($_FILES['image_' . $language['id_lang']]['tmp_name']) &&
-                    !empty($imagesize) &&
-                    in_array(
-                        strtolower(substr(strrchr($imagesize['mime'], '/'), 1)), array(
-                            'jpg',
-                            'gif',
-                            'jpeg',
-                            'png'
-                        )
-                    ) &&
-                    in_array($type, array('jpg', 'gif', 'jpeg', 'png'))
-                ) {
-                    $temp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS');
-                    $salt = sha1(microtime());
-                    if ($error = ImageManager::validateUpload($_FILES['image_' . $language['id_lang']])) {
-                        $errors[] = $error;
-                    } elseif (!$temp_name || !move_uploaded_file($_FILES['image_' . $language['id_lang']]['tmp_name'], $temp_name)) {
-                        return false;
-                    } elseif (!ImageManager::resize($temp_name, dirname(__FILE__) . '/images/' . $salt . '_' . $_FILES['image_' . $language['id_lang']]['name'], null, null, $type)) {
-                        $errors[] = $this->displayError($this->l('An error occurred during the image upload process.'));
+                if (isset($_FILES['image_' . $langId])) {
+                    $fileEntry = $_FILES['image_' . $langId];
+                    $tempFile = null;
+                    try {
+                        $tempFile = $this->uploadImage($fileEntry);
+                        if ($tempFile) {
+                            $slide->image[$langId] = $this->processImage($tempFile, $fileEntry['name']);
+                        }
+                    } catch (Exception $e) {
+                        $errors[] = sprintf($this->l('Failed to upload image for language %s: %s'), $language['name'], $e->getMessage());
+                    } finally {
+                        if ($tempFile) {
+                            unlink(@$tempFile);
+                        }
                     }
-                    @unlink($temp_name);
-                    $slide->image[$language['id_lang']] = $salt . '_' . $_FILES['image_' . $language['id_lang']]['name'];
-                } elseif (Tools::getValue('image_old_' . $language['id_lang']) != '') {
-                    $slide->image[$language['id_lang']] = Tools::getValue('image_old_' . $language['id_lang']);
                 }
             }
 
@@ -585,11 +545,11 @@ class HomeSlider extends Module
                 /* Adds */
                 if (!Tools::getValue('id_slide')) {
                     if (!$slide->add()) {
-                        $errors[] = $this->displayError($this->l('The slide could not be added.'));
+                        $errors[] = $this->l('The slide could not be added.');
                     }
                 } elseif (!$slide->update()) {
                     /* Update */
-                    $errors[] = $this->displayError($this->l('The slide could not be updated.'));
+                    $errors[] = $this->l('The slide could not be updated.');
                 }
                 $this->clearCache();
             }
@@ -599,7 +559,7 @@ class HomeSlider extends Module
             $res = $slide->delete();
             $this->clearCache();
             if (!$res) {
-                $this->_html .= $this->displayError('Could not delete.');
+                $errors[] = $this->l('Could not delete.');
             } else {
                 Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', true) . '&conf=1&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name);
             }
@@ -627,7 +587,8 @@ class HomeSlider extends Module
             $slides = $this->getSlides(true);
             if (is_array($slides)) {
                 foreach ($slides as &$slide) {
-                    $slide['sizes'] = @getimagesize((dirname(__FILE__) . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . $slide['image']));
+                    $slide['imageUrl'] = static::getImageBaseUri() . $slide['image'];
+                    $slide['sizes'] = @getimagesize(static::getImageDir() . $slide['image']);
                     if (isset($slide['sizes'][3]) && $slide['sizes'][3]) {
                         $slide['size'] = $slide['sizes'][3];
                     }
@@ -836,7 +797,7 @@ class HomeSlider extends Module
     public function getAllImagesBySlidesId($id_slides, $active = null, $id_shop = null)
     {
         $this->context = Context::getContext();
-        $images = array();
+        $images = [];
 
         if (!isset($id_shop)) {
             $id_shop = $this->context->shop->id;
@@ -919,7 +880,7 @@ class HomeSlider extends Module
             array(
                 'link' => $this->context->link,
                 'slides' => $slides,
-                'image_baseurl' => $this->_path . 'images/'
+                'image_baseurl' => static::getImageBaseUri(),
             )
         );
 
@@ -1042,7 +1003,7 @@ class HomeSlider extends Module
             'fields_value' => $this->getAddFieldsValues(),
             'languages' => $controller->getLanguages(),
             'id_language' => $this->context->language->id,
-            'image_baseurl' => $this->_path . 'images/'
+            'image_baseurl' => static::getImageBaseUri(),
         );
 
         $helper->override_folder = '/';
@@ -1302,4 +1263,112 @@ class HomeSlider extends Module
     {
         return Tools::encrypt($this->name);
     }
+
+    /**
+     * Validates uploaded image file, and moves it to temp location
+     *
+     * @return string|false temp location
+     *
+     * @throws PrestaShopException
+     */
+    protected function uploadImage($fileEntry)
+    {
+        if (empty($fileEntry['name']) || empty($fileEntry['tmp_name'])) {
+            return false;
+        }
+        // validate file type
+        $ext = strtolower(substr(strrchr($fileEntry['name'], '.'), 1));
+        if (! in_array($ext, static::ALLOWED_EXTENSIONS)) {
+            throw new PrestaShopException(sprintf($this->l("Unsupported file extension %s"), $ext));
+        }
+        if ($error = ImageManager::validateUpload($fileEntry)) {
+            throw new PrestaShopException($error);
+        }
+        $tempFile = tempnam(_PS_TMP_IMG_DIR_, $this->name . '_');
+        if (! move_uploaded_file($fileEntry['tmp_name'], $tempFile)) {
+            throw new PrestaShopException($this->l("Failed to move file to temp location"));
+        }
+        return $tempFile;
+    }
+
+    /**
+     * @param string $sourceFile
+     *
+     * @return string
+     *
+     * @throws PrestaShopException
+     */
+    protected function processImage($sourceFile, $sourceFileName)
+    {
+        $imageSize = getimagesize($sourceFile);
+        if (! $imageSize) {
+            throw new PrestaShopException($this->l("Failed to resolve image size"));
+        }
+        $mimeType = strtolower(substr(strrchr($imageSize['mime'], '/'), 1));
+        if (! in_array($mimeType, static::ALLOWED_EXTENSIONS)) {
+            throw new PrestaShopException(sprintf($this->l("Unsupported mime type  %s"), $mimeType));
+        }
+
+        // resize file to target destination
+        $filename = md5(microtime()) . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $sourceFileName);
+        $filepath = static::getImageDir() . $filename;
+        if (! ImageManager::resize($sourceFile, $filepath, null, null, $mimeType)) {
+            throw new PrestaShopException($this->l('An error occurred during the image resizing'));
+        }
+        return $filename;
+    }
+
+    /**
+     * Helper method to delete unused image files from img directory
+     *
+     * @param array|null $imagesToKeep
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public static function cleanImages($imagesToKeep = null)
+    {
+        if (is_null($imagesToKeep)) {
+            $imagesToKeep = array_column(Db::getInstance()->executeS((new DbQuery())
+                ->select('DISTINCT(image) as image')
+                ->from('homeslider_slides_lang')
+            ), 'image');
+        }
+
+        $dir = static::getImageDir();
+        foreach (scandir($dir) as $file) {
+            $ext = pathinfo($file, PATHINFO_EXTENSION);
+            if (in_array($ext, static::ALLOWED_EXTENSIONS)) {
+                if (! in_array($file, $imagesToKeep)) {
+                    unlink($dir . $file);
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns path to image directory
+     *
+     * @return string
+     */
+    public static function getImageDir()
+    {
+        $imageDir = rtrim(_PS_IMG_DIR_, '/') . '/homeslider/';
+        // create directory if it doesn't exist yet
+        if (! file_exists($imageDir)) {
+            mkdir($imageDir);
+        }
+        return $imageDir;
+    }
+
+    /**
+     * Returns base URI to images
+     *
+     * @return string
+     */
+    public static function getImageBaseUri()
+    {
+        return rtrim(_PS_IMG_, '/') . '/homeslider/';
+    }
+
 }
