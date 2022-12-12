@@ -95,6 +95,8 @@ class HomeSlider extends Module
             $shops = Shop::getContextListShopID();
             $shop_groups_list = array();
 
+            $res = true;
+
             /* Setup each shop */
             foreach ($shops as $shop_id) {
                 $shop_group_id = (int)Shop::getGroupFromShop($shop_id, true);
@@ -104,37 +106,37 @@ class HomeSlider extends Module
                 }
 
                 /* Sets up configuration */
-                $res = Configuration::updateValue('HOMESLIDER_WIDTH', $this->default_width, false, $shop_group_id, $shop_id);
-                $res &= Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed, false, $shop_group_id, $shop_id);
-                $res &= Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause, false, $shop_group_id, $shop_id);
-                $res &= Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop, false, $shop_group_id, $shop_id);
+                $res = Configuration::updateValue('HOMESLIDER_WIDTH', $this->default_width, false, $shop_group_id, $shop_id) && $res;
+                $res = Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed, false, $shop_group_id, $shop_id) && $res;
+                $res = Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause, false, $shop_group_id, $shop_id) && $res;
+                $res = Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop, false, $shop_group_id, $shop_id) && $res;
             }
 
             /* Sets up Shop Group configuration */
-            if (count($shop_groups_list)) {
+            if ($shop_groups_list) {
                 foreach ($shop_groups_list as $shop_group_id) {
-                    $res = Configuration::updateValue('HOMESLIDER_WIDTH', $this->default_width, false, $shop_group_id);
-                    $res &= Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed, false, $shop_group_id);
-                    $res &= Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause, false, $shop_group_id);
-                    $res &= Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop, false, $shop_group_id);
+                    $res = Configuration::updateValue('HOMESLIDER_WIDTH', $this->default_width, false, $shop_group_id) && $res;
+                    $res = Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed, false, $shop_group_id) && $res;
+                    $res = Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause, false, $shop_group_id) && $res;
+                    $res = Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop, false, $shop_group_id) && $res;
                 }
             }
 
             /* Sets up Global configuration */
-            $res = Configuration::updateValue('HOMESLIDER_WIDTH', $this->default_width);
-            $res &= Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed);
-            $res &= Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause);
-            $res &= Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop);
+            $res = Configuration::updateValue('HOMESLIDER_WIDTH', $this->default_width) && $res;
+            $res = Configuration::updateValue('HOMESLIDER_SPEED', $this->default_speed) && $res;
+            $res = Configuration::updateValue('HOMESLIDER_PAUSE', $this->default_pause) && $res;
+            $res = Configuration::updateValue('HOMESLIDER_LOOP', $this->default_loop) && $res;
 
             /* Creates tables */
-            $res &= $this->createTables();
+            $res = $this->createTables() && $res;
 
             /* Adds samples */
             if ($res) {
                 $this->installSamples();
             }
 
-            return (bool)$res;
+            return $res;
         }
 
         return false;
@@ -198,12 +200,12 @@ class HomeSlider extends Module
             $res = $this->deleteTables();
 
             /* Unsets configuration */
-            $res &= Configuration::deleteByName('HOMESLIDER_WIDTH');
-            $res &= Configuration::deleteByName('HOMESLIDER_SPEED');
-            $res &= Configuration::deleteByName('HOMESLIDER_PAUSE');
-            $res &= Configuration::deleteByName('HOMESLIDER_LOOP');
+            $res = Configuration::deleteByName('HOMESLIDER_WIDTH') && $res;
+            $res = Configuration::deleteByName('HOMESLIDER_SPEED') && $res;
+            $res = Configuration::deleteByName('HOMESLIDER_PAUSE') && $res;
+            $res = Configuration::deleteByName('HOMESLIDER_LOOP') && $res;
 
-            return (bool)$res;
+            return $res;
         }
 
         return false;
@@ -228,17 +230,17 @@ class HomeSlider extends Module
 		');
 
         /* Slides configuration */
-        $res &= Db::getInstance()->execute('
+        $res = Db::getInstance()->execute('
 			CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'homeslider_slides` (
 			  `id_homeslider_slides` int(10) unsigned NOT NULL AUTO_INCREMENT,
 			  `position` int(10) unsigned NOT NULL DEFAULT \'0\',
 			  `active` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
 			  PRIMARY KEY (`id_homeslider_slides`)
 			) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=UTF8;
-		');
+		') && $res;
 
         /* Slides lang configuration */
-        $res &= Db::getInstance()->execute('
+        $res = Db::getInstance()->execute('
 			CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'homeslider_slides_lang` (
 			  `id_homeslider_slides` int(10) unsigned NOT NULL,
 			  `id_lang` int(10) unsigned NOT NULL,
@@ -249,7 +251,7 @@ class HomeSlider extends Module
 			  `image` varchar(255) NOT NULL,
 			  PRIMARY KEY (`id_homeslider_slides`,`id_lang`)
 			) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=UTF8;
-		');
+		') && $res;
 
         return $res;
     }
@@ -458,6 +460,7 @@ class HomeSlider extends Module
             $shop_groups_list = array();
             $shops = Shop::getContextListShopID();
 
+            $res = true;
             foreach ($shops as $shop_id) {
                 $shop_group_id = (int)Shop::getGroupFromShop($shop_id, true);
 
@@ -465,35 +468,35 @@ class HomeSlider extends Module
                     $shop_groups_list[] = $shop_group_id;
                 }
 
-                $res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id, $shop_id);
-                $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id, $shop_id);
-                $res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id, $shop_id);
-                $res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id, $shop_id);
+                $res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id, $shop_id) && $res;
+                $res = Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id, $shop_id) && $res;
+                $res = Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id, $shop_id) && $res;
+                $res = Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id, $shop_id) && $res;
             }
 
             /* Update global shop context if needed*/
             switch ($shop_context) {
                 case Shop::CONTEXT_ALL:
-                    $res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'));
-                    $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'));
-                    $res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'));
-                    $res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'));
+                    $res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH')) && $res;
+                    $res = Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED')) && $res;
+                    $res = Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE')) && $res;
+                    $res = Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP')) && $res;
                     if (count($shop_groups_list)) {
                         foreach ($shop_groups_list as $shop_group_id) {
-                            $res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id);
-                            $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id);
-                            $res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id);
-                            $res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id);
+                            $res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id) && $res;
+                            $res = Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id) && $res;
+                            $res = Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id) && $res;
+                            $res = Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id) && $res;
                         }
                     }
                     break;
                 case Shop::CONTEXT_GROUP:
                     if (count($shop_groups_list)) {
                         foreach ($shop_groups_list as $shop_group_id) {
-                            $res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id);
-                            $res &= Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id);
-                            $res &= Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id);
-                            $res &= Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id);
+                            $res = Configuration::updateValue('HOMESLIDER_WIDTH', (int)Tools::getValue('HOMESLIDER_WIDTH'), false, $shop_group_id) && $res;
+                            $res = Configuration::updateValue('HOMESLIDER_SPEED', (int)Tools::getValue('HOMESLIDER_SPEED'), false, $shop_group_id) && $res;
+                            $res = Configuration::updateValue('HOMESLIDER_PAUSE', (int)Tools::getValue('HOMESLIDER_PAUSE'), false, $shop_group_id) && $res;
+                            $res = Configuration::updateValue('HOMESLIDER_LOOP', (int)Tools::getValue('HOMESLIDER_LOOP'), false, $shop_group_id) && $res;
                         }
                     }
                     break;
@@ -1007,10 +1010,9 @@ class HomeSlider extends Module
             $fields_form['form']['images'] = $slide->image;
 
             $has_picture = true;
-
             foreach (Language::getLanguages(false) as $lang) {
                 if (!isset($slide->image[$lang['id_lang']])) {
-                    $has_picture &= false;
+                    $has_picture = false;
                 }
             }
 
