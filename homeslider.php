@@ -379,7 +379,6 @@ class HomeSlider extends Module
             /* If edit : checks id_slide */
             if (Tools::isSubmit('id_slide')) {
 
-                //d(var_dump(Tools::getValue('id_slide')));
                 if (!Validate::isInt(Tools::getValue('id_slide')) && !$this->slideExists(Tools::getValue('id_slide'))) {
                     $errors[] = $this->l('Invalid slide ID');
                 }
@@ -387,19 +386,19 @@ class HomeSlider extends Module
             /* Checks title/url/legend/description/image */
             $languages = Language::getLanguages(false);
             foreach ($languages as $language) {
-                if (Tools::strlen(Tools::getValue('title_' . $language['id_lang'])) > 255) {
+                if (mb_strlen(Tools::getValue('title_' . $language['id_lang'])) > 255) {
                     $errors[] = $this->l('The title is too long.');
                 }
-                if (Tools::strlen(Tools::getValue('legend_' . $language['id_lang'])) > 255) {
+                if (mb_strlen(Tools::getValue('legend_' . $language['id_lang'])) > 255) {
                     $errors[] = $this->l('The caption is too long.');
                 }
-                if (Tools::strlen(Tools::getValue('url_' . $language['id_lang'])) > 255) {
+                if (mb_strlen(Tools::getValue('url_' . $language['id_lang'])) > 255) {
                     $errors[] = $this->l('The URL is too long.');
                 }
-                if (Tools::strlen(Tools::getValue('description_' . $language['id_lang'])) > 4000) {
+                if (mb_strlen(Tools::getValue('description_' . $language['id_lang'])) > 4000) {
                     $errors[] = $this->l('The description is too long.');
                 }
-                if (Tools::strlen(Tools::getValue('url_' . $language['id_lang'])) > 0 && !Validate::isUrl(Tools::getValue('url_' . $language['id_lang']))) {
+                if (mb_strlen(Tools::getValue('url_' . $language['id_lang'])) > 0 && !Validate::isUrl(Tools::getValue('url_' . $language['id_lang']))) {
                     $errors[] = $this->l('The URL format is not correct.');
                 }
                 if (Tools::getValue('image_' . $language['id_lang']) != null && !Validate::isFileName(Tools::getValue('image_' . $language['id_lang']))) {
@@ -412,13 +411,13 @@ class HomeSlider extends Module
 
             /* Checks title/url/legend/description for default lang */
             $id_lang_default = (int)Configuration::get('PS_LANG_DEFAULT');
-            if (Tools::strlen(Tools::getValue('title_' . $id_lang_default)) == 0) {
+            if (mb_strlen(Tools::getValue('title_' . $id_lang_default)) == 0) {
                 $errors[] = $this->l('The title is not set.');
             }
-            if (Tools::strlen(Tools::getValue('legend_' . $id_lang_default)) == 0) {
+            if (mb_strlen(Tools::getValue('legend_' . $id_lang_default)) == 0) {
                 $errors[] = $this->l('The caption is not set.');
             }
-            if (Tools::strlen(Tools::getValue('url_' . $id_lang_default)) == 0) {
+            if (mb_strlen(Tools::getValue('url_' . $id_lang_default)) == 0) {
                 $errors[] = $this->l('The URL is not set.');
             }
             if (!Tools::isSubmit('has_picture') && (!isset($_FILES['image_' . $id_lang_default]) || empty($_FILES['image_' . $id_lang_default]['tmp_name']))) {
@@ -546,14 +545,14 @@ class HomeSlider extends Module
                 $slide->description[$language['id_lang']] = Tools::getValue('description_' . $language['id_lang']);
 
                 /* Uploads image and sets slide */
-                $type = Tools::strtolower(Tools::substr(strrchr($_FILES['image_' . $language['id_lang']]['name'], '.'), 1));
+                $type = strtolower(substr(strrchr($_FILES['image_' . $language['id_lang']]['name'], '.'), 1));
                 $imagesize = @getimagesize($_FILES['image_' . $language['id_lang']]['tmp_name']);
                 if (isset($_FILES['image_' . $language['id_lang']]) &&
                     isset($_FILES['image_' . $language['id_lang']]['tmp_name']) &&
                     !empty($_FILES['image_' . $language['id_lang']]['tmp_name']) &&
                     !empty($imagesize) &&
                     in_array(
-                        Tools::strtolower(Tools::substr(strrchr($imagesize['mime'], '/'), 1)), array(
+                        strtolower(substr(strrchr($imagesize['mime'], '/'), 1)), array(
                             'jpg',
                             'gif',
                             'jpeg',
