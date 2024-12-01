@@ -1279,14 +1279,14 @@ class HomeSlider extends Module
         // validate file type
         $ext = strtolower(substr(strrchr($fileEntry['name'], '.'), 1));
         if (! in_array($ext, static::ALLOWED_EXTENSIONS)) {
-            throw new PrestaShopException(sprintf($this->l("Unsupported file extension %s"), $ext));
+            throw new PrestaShopException(sprintf($this->l('Unsupported file extension %s'), $ext));
         }
         if ($error = ImageManager::validateUpload($fileEntry)) {
             throw new PrestaShopException($error);
         }
         $tempFile = tempnam(_PS_TMP_IMG_DIR_, $this->name . '_');
         if (! move_uploaded_file($fileEntry['tmp_name'], $tempFile)) {
-            throw new PrestaShopException($this->l("Failed to move file to temp location"));
+            throw new PrestaShopException($this->l('Failed to move file to temp location'));
         }
         return $tempFile;
     }
@@ -1302,11 +1302,11 @@ class HomeSlider extends Module
     {
         $imageSize = getimagesize($sourceFile);
         if (! $imageSize) {
-            throw new PrestaShopException($this->l("Failed to resolve image size"));
+            throw new PrestaShopException($this->l('Failed to resolve image size'));
         }
         $mimeType = strtolower(substr(strrchr($imageSize['mime'], '/'), 1));
         if (! in_array($mimeType, static::ALLOWED_EXTENSIONS)) {
-            throw new PrestaShopException(sprintf($this->l("Unsupported mime type  %s"), $mimeType));
+            throw new PrestaShopException(sprintf($this->l('Unsupported mime type  %s'), $mimeType));
         }
 
         // resize file to target destination
